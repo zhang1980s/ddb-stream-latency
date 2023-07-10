@@ -54,7 +54,7 @@ func NewAppMainStack(scope constructs.Construct, id string, props *AppMainStackP
 		StartingPosition: awslambda.StartingPosition_LATEST,
 		Enabled:          jsii.Bool(true)}))
 
-	awsdynamodb.NewTable(stack, jsii.String("dashboard"), &awsdynamodb.TableProps{
+	dashboardTable := awsdynamodb.NewTable(stack, jsii.String("dashboard"), &awsdynamodb.TableProps{
 		PartitionKey: &awsdynamodb.Attribute{
 			Name: jsii.String("timestamp"),
 			Type: awsdynamodb.AttributeType_STRING,
@@ -65,6 +65,8 @@ func NewAppMainStack(scope constructs.Construct, id string, props *AppMainStackP
 		WriteCapacity: jsii.Number(config.DashboardTableWriteCapacity),
 		Stream:        awsdynamodb.StreamViewType_NEW_IMAGE,
 	})
+
+	dashboardTable.GrantReadWriteData(fn)
 
 	return stack
 }
