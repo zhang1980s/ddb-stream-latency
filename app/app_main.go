@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsdynamodb"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awslambdaeventsources"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 )
@@ -21,7 +22,7 @@ func NewAppMainStack(scope constructs.Construct, id string, props *AppMainStackP
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
 
-	awsdynamodb.NewTable(stack, jsii.String("timer"), &awsdynamodb.TableProps{
+	timertable := awsdynamodb.NewTable(stack, jsii.String("timer"), &awsdynamodb.TableProps{
 		PartitionKey: &awsdynamodb.Attribute{
 			Name: jsii.String("timestamp"),
 			Type: awsdynamodb.AttributeType_STRING,
@@ -31,9 +32,10 @@ func NewAppMainStack(scope constructs.Construct, id string, props *AppMainStackP
 		ReadCapacity:  jsii.Number(config.TimerTableReadCapacity),
 		WriteCapacity: jsii.Number(config.TimerTableWriteCapacity),
 		Stream:        awsdynamodb.StreamViewType_NEW_IMAGE,
+		RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
 	})
 
-	awslambda.NewFunction(stack, jsii.String("ddbreader"), &awslambda.FunctionProps{
+	fn := awslambda.NewFunction(stack, jsii.String("ddbreader"), &awslambda.FunctionProps{
 		Runtime:    awslambda.Runtime_GO_1_X(),
 		Handler:    jsii.String("bin/reader"),
 		MemorySize: jsii.Number(128),
@@ -44,6 +46,11 @@ func NewAppMainStack(scope constructs.Construct, id string, props *AppMainStackP
 			RetryAttempts: jsii.Number(1),
 		},
 	})
+
+	fn.AddEventSource(awslambdaeventsources.NewDynamoEventSource(timertable, &awslambdaeventsources.DynamoEventSourceProps{
+		BatchSize:        jsii.Number(1),
+		StartingPosition: awslambda.StartingPosition_LATEST,
+		Enabled:          jsii.Bool(true)}))
 
 	awsdynamodb.NewTable(stack, jsii.String("dashboard"), &awsdynamodb.TableProps{
 		PartitionKey: &awsdynamodb.Attribute{
