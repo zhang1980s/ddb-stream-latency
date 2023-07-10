@@ -47,8 +47,8 @@ Usage of ./ddbwriter:
 
 ---
 ### TODO LIST
-- [ ] 通过CDK自动部署压测环境
-- [ ] 支持codepipeline提交更新
+- [x] 通过CDK自动部署压测环境
+- [x] 支持codepipeline提交更新
 - [ ] 使用eks部署压测客户端
 - [ ] 使用cdk8s管理压测任务
 - [ ] 自动删除lambda cloudwatch log group日志
