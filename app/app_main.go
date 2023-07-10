@@ -27,13 +27,15 @@ func NewAppMainStack(scope constructs.Construct, id string, props *AppMainStackP
 			Type: awsdynamodb.AttributeType_STRING,
 		},
 		BillingMode:   awsdynamodb.BillingMode_PROVISIONED,
+		TableName:     jsii.String("timer"),
 		ReadCapacity:  jsii.Number(config.TimerTableReadCapacity),
 		WriteCapacity: jsii.Number(config.TimerTableWriteCapacity),
+		Stream:        awsdynamodb.StreamViewType_NEW_IMAGE,
 	})
 
 	awslambda.NewFunction(stack, jsii.String("ddbreader"), &awslambda.FunctionProps{
 		Runtime:    awslambda.Runtime_GO_1_X(),
-		Handler:    jsii.String("bin/ddbreader"),
+		Handler:    jsii.String("bin/reader"),
 		MemorySize: jsii.Number(128),
 		Timeout:    awscdk.Duration_Seconds(jsii.Number(10)),
 		Code:       awslambda.Code_FromAsset(jsii.String("app/ddbreader"), nil),
@@ -41,6 +43,18 @@ func NewAppMainStack(scope constructs.Construct, id string, props *AppMainStackP
 			RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
 			RetryAttempts: jsii.Number(1),
 		},
+	})
+
+	awsdynamodb.NewTable(stack, jsii.String("dashboard"), &awsdynamodb.TableProps{
+		PartitionKey: &awsdynamodb.Attribute{
+			Name: jsii.String("timestamp"),
+			Type: awsdynamodb.AttributeType_STRING,
+		},
+		BillingMode:   awsdynamodb.BillingMode_PROVISIONED,
+		TableName:     jsii.String("dashboard"),
+		ReadCapacity:  jsii.Number(config.DashboardTableReadCapacity),
+		WriteCapacity: jsii.Number(config.DashboardTableWriteCapacity),
+		Stream:        awsdynamodb.StreamViewType_NEW_IMAGE,
 	})
 
 	return stack
