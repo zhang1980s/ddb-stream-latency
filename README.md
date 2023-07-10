@@ -37,7 +37,7 @@ Usage of ./ddbwriter:
 
 3. 生成压测负载
 
-启动是个go rountine生成压力，每秒钟写一次timer表，程序执行市场720分钟（12小时）。
+启动10个go rountine生成压力，每秒钟写一次timer表，程序执行市场720分钟（12小时）。
 ```
 ./ddbwriter -d 720 -r 10 -t 1
 ```
