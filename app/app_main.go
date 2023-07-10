@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2/awsdynamodb"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambda"
 	"github.com/aws/aws-cdk-go/awscdk/v2/awslambdaeventsources"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awslogs"
 	"github.com/aws/constructs-go/constructs/v10"
 	"github.com/aws/jsii-runtime-go"
 )
@@ -45,6 +46,7 @@ func NewAppMainStack(scope constructs.Construct, id string, props *AppMainStackP
 			RemovalPolicy: awscdk.RemovalPolicy_DESTROY,
 			RetryAttempts: jsii.Number(1),
 		},
+		LogRetention: awslogs.RetentionDays_FIVE_DAYS,
 	})
 
 	fn.AddEventSource(awslambdaeventsources.NewDynamoEventSource(timertable, &awslambdaeventsources.DynamoEventSourceProps{
