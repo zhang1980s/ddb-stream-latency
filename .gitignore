@@ -29,3 +29,5 @@ cdk.out
 
 # Remove config/config.go
 # config/config.go
+
+app/ddbwriter/ddbwriter
